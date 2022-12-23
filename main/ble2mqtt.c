@@ -298,7 +298,7 @@ static void ble_publish_connected(mac_addr_t mac, uint8_t is_connected)
     if (is_connected)
     {
         const char *device_name = device_name_get();
-        
+
         /* Subscribe for other devices claiming this device is disconnected */
         mqtt_subscribe(topic, config_mqtt_qos_get(), _ble_on_mqtt_connected_cb,
             strdup(mactoa(mac)), free);
@@ -355,6 +355,9 @@ static void ble_on_device_discovered(mac_addr_t mac, int rssi)
     ESP_LOGI(TAG, "Discovered BLE device: " MAC_FMT " (RSSI: %d), %sconnecting",
         MAC_PARAM(mac), rssi, connect ? "" : "not ");
 
+    // Don't actually connect to ble devices. We only wan't to forward the
+    // advertisement data to MQTT.
+    connect = 0;
     if (!connect)
         return;
 
